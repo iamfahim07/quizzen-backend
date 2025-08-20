@@ -22,14 +22,6 @@ router.get("/", async (req, res) => {
       img_ref: 1,
     });
 
-    async function delay(ms) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-      });
-    }
-
-    await delay(5000);
-
     if (topics.length > 0) {
       res.status(200).json({ data: topics });
     } else {

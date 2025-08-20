@@ -1,31 +1,16 @@
-import {
-  GoogleGenAI,
-  Type,
-  createPartFromUri,
-  createUserContent,
-} from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const ai = new GoogleGenAI({
   apiKey: "AIzaSyAGKbyiNTP5tul3EooIHR6ryqmJWwyZXLY",
 });
 
-export async function testGenerateQuiz(
+export async function generateQuizFromInlineData(
   userPrompt,
-  files_array = null,
-  modifyExisting = false,
-  prevConversations = []
+  files_array = null
 ) {
-  const instruction = `You are an AI quiz generator. Your goal is to create a structured quiz based on the user's provided prompt (text and/or file content).
+  const instruction = `You are an AI quiz generator. Your goal is to create a structured quiz based on the user's prompt (text and/or file content).
 
-  ${
-    modifyExisting
-      ? "The user wants to modify the Gemini generated previous response. Consider the previous attached files, previous_prompts, and Gemini_generated_previous_quizzes if provided."
-      : "This is an initial request for a new quiz."
-  }
-
-  In your response, begin with a dynamic, conversational tone message that Includes a brief note explaining the steps you took or the information you included, then ask the user if they’d like any changes.
-
-  Also, in your response, include a short and simple topic name for the quiz (e.g., 'Football Quiz', 'History Quiz', 'Mythology Quiz').
+  In your response, include a short and simple topic name for the quiz (e.g., 'Football Quiz', 'History Quiz', 'Mythology Quiz'). Also, include a dynamic conversational message to the user.
   
   Generate 10 quiz questions by default if the user doesn't mention how many questions they want.
   By default, create the quiz in normal mode if the user doesn't specify a difficulty level.
@@ -151,67 +136,30 @@ export async function testGenerateQuiz(
   The quiz should be based on the content provided.`;
 
   try {
-    // res.json({ key, value, expiresIn: TTL_SECONDS });
+    let finalContents = [
+      { text: instruction }, // The main instruction for the AI
+      { text: userPrompt },
+    ];
 
-    // const imageBlob = new Blob([files_array[0].buffer], {
-    //   type: files_array[0].mimetype,
-    // });
-    // const imageBlob2 = new Blob([files_array[1].buffer], {
-    //   type: files_array[1].mimetype,
-    // });
+    if (files_array) {
+      // const base64Data = file_object.buffer.toString("base64");
 
-    // const myfile = await ai.files.upload({
-    //   file: imageBlob,
-    //   config: { mimeType: files_array[0].mimetype },
-    // });
+      const filesBase64Data = files_array.map((file) => {
+        return {
+          inlineData: {
+            mimeType: file.mimetype,
+            data: file.buffer.toString("base64"),
+          },
+        };
+      });
 
-    // const myfile2 = await ai.files.upload({
-    //   file: imageBlob2,
-    //   config: { mimeType: files_array[1].mimetype },
-    // });
-
-    // changeing code
-    const filesParts = [];
-    if (files_array && files_array.length > 0) {
-      for (const file of files_array) {
-        const fileBlob = new Blob([file.buffer], {
-          type: file.mimetype,
-        });
-
-        const fileData = await ai.files.upload({
-          file: fileBlob,
-          config: { mimeType: file.mimetype },
-        });
-
-        filesParts.push(createPartFromUri(fileData.uri, fileData.mimeType));
-      }
+      finalContents.splice(finalContents.length - 1, 0, ...filesBase64Data);
     }
-
-    // const modifiedPrevConversations = prevConversations.flatMap((el) => {
-    //   if (Array.isArray(el.filesInfo)) {
-    //     return el.filesInfo.map((fi) =>
-    //       createPartFromUri(fi.fileUri, fi.mimeType)
-    //     );
-    //   }
-
-    //   return el;
-    // });
 
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: createUserContent([
-        // instruction,
-        { text: instruction },
-        ...prevConversations,
-        // createPartFromUri(myfile.uri, myfile.mimeType),
-        // createPartFromUri(myfile2.uri, myfile2.mimeType),
-        ...filesParts,
-        // userPrompt,
-        { text: userPrompt },
-      ]),
+      contents: finalContents,
       config: {
-        systemInstruction:
-          "You are a quiz generator bot. Your sole task is to create quizzes according to the user's specifications, following the responseSchema configuration.",
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -283,8 +231,9 @@ export async function testGenerateQuiz(
       },
     });
 
-    return { response, filesParts, userPrompt };
+    return response;
   } catch (err) {
     console.log(err);
   }
 }
+// test

@@ -4,8 +4,8 @@ import fileUploadMiddleware from "../middlewares/file-upload-middleware.mjs";
 
 // internal import
 import { getWithTTL, setWithExpire } from "../config/redis-client.mjs";
-// import { generateQuiz } from "../services/gemini-service.mjs";
-import { testGenerateQuiz } from "../services/test-servece.mjs";
+// import { generateQuizFromInlineData } from "../services/gemini-inline-data-service.mjs";
+import { generateQuizFromFileApi } from "../services/gemini-file-api-service.mjs";
 import { generateUniqueId } from "../utilities/utils.mjs";
 
 // router setup
@@ -13,7 +13,8 @@ const router = express.Router();
 
 // post a quiz
 router.post("/", fileUploadMiddleware, async (req, res) => {
-  let { prompt, conversationId, modifyExisting, files_array } = req.body;
+  let { prompt, difficulty, conversationId, modifyExisting, files_array } =
+    req.body;
   modifyExisting = modifyExisting === "true";
 
   try {
@@ -22,12 +23,14 @@ router.post("/", fileUploadMiddleware, async (req, res) => {
     if (modifyExisting) {
       const { value, ttl } = (await getWithTTL(conversationId)) || {};
 
-      const { response, filesParts, userPrompt } = await testGenerateQuiz(
-        prompt,
-        files_array,
-        modifyExisting,
-        value
-      );
+      const { response, filesParts, userPrompt } =
+        await generateQuizFromFileApi(
+          prompt,
+          difficulty,
+          files_array,
+          modifyExisting,
+          value
+        );
 
       const parsedResponse = JSON.parse(response.text);
 
@@ -59,10 +62,8 @@ router.post("/", fileUploadMiddleware, async (req, res) => {
 
       // console.log(updatedValue[0].filesInfo);
     } else {
-      const { response, filesParts, userPrompt } = await testGenerateQuiz(
-        prompt,
-        files_array
-      );
+      const { response, filesParts, userPrompt } =
+        await generateQuizFromFileApi(prompt, difficulty, files_array);
       const parsedResponse = JSON.parse(response.text);
 
       quizData = { ...parsedResponse };
