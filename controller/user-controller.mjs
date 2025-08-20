@@ -44,13 +44,23 @@ export const verifyToken = async (req, res) => {
 // login router callback function
 export const login = async (req, res) => {
   try {
-    if (!req?.body?.username || !req?.body?.password) {
+    const { username, password } = req.body || {};
+
+    if (!username || !password) {
       return res
         .status(400)
         .json({ message: "Please provide user name and password" });
     }
 
-    const { username, password } = req.body;
+    if (typeof username !== "string" || typeof password !== "string") {
+      return res.status(400).json({ message: "Invalid input format" });
+    }
+
+    if (username.trim().length === 0 || password.length === 0) {
+      return res.status(400).json({
+        message: "Username and password cannot be empty",
+      });
+    }
 
     const {
       user,
@@ -72,18 +82,15 @@ export const login = async (req, res) => {
 
     res.status(200).json({ data: user });
   } catch (err) {
-    // const isAuthError =
-    //   err.message.includes("User not found") ||
-    //   err.message.includes("Invalid password");
-    // const statusCode = isAuthError ? 401 : 500;
+    const isAuthError = err.message.includes("Invalid credentials!");
 
-    if (err.message === "User not found or Invalid password") {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    const errMsg = isAuthError
+      ? err.message
+      : "An internal server error occurred";
 
-    // res.status(500).json({ message: "Authentication error!" });
-    // res.status(statusCode).json({ message: err.message });
-    res.status(500).json({ message: "An internal server error occurred" });
+    const statusCode = isAuthError ? 401 : 500;
+
+    return res.status(statusCode).json({ message: errMsg });
   }
 };
 

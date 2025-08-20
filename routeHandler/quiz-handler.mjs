@@ -17,14 +17,6 @@ router.get("/count", async (req, res) => {
       { $group: { _id: null, totalQuestions: { $sum: "$vaultSize" } } },
     ]);
 
-    async function delay(ms) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-      });
-    }
-
-    await delay(5000);
-
     res.status(200).json({ data: result[0]?.totalQuestions || 0 });
   } catch (err) {
     res.status(500).json({
@@ -39,14 +31,6 @@ router.get("/:topicId", async (req, res) => {
     const quiz = await QuizModel.findOne({
       relatedTopicId: req.params.topicId,
     });
-
-    async function delay(ms) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-      });
-    }
-
-    await delay(5000);
 
     if (quiz) {
       res.status(200).json({ data: quiz.questionVault });

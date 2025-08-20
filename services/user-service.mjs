@@ -19,30 +19,35 @@ const checkAuth = async (accessToken) => {
 };
 
 const login = async (username, password) => {
-  const user = (await userModel.findOne({ username })) || {};
+  try {
+    const user = await userModel.findOne({ username });
 
-  // if (!user) {
-  //   throw new Error("User not found or Invalid password");
-  // }
+    // Always perform bcrypt comparison to prevent timing attacks
+    const hashToCompare =
+      user?.password || "$2b$12$dummyhashtopreventtimingattacks1234567890";
 
-  const isPasswordCorrect = await bcrypt.compare(password, user?.password);
+    const isPasswordCorrect = await bcrypt.compare(password, hashToCompare);
 
-  if (!user || !isPasswordCorrect) {
-    throw new Error("User not found or Invalid password");
+    if (!user || !isPasswordCorrect) {
+      throw new Error("Invalid credentials!");
+    }
+
+    const userData = {
+      fullName: user.fullName,
+      username: user.username,
+      role: user.role,
+    };
+
+    const tokens = getNewTokens(userData);
+
+    return {
+      user: userData,
+      tokens,
+    };
+  } catch (err) {
+    console.error("Login error:", err);
+    throw new Error("Invalid credentials!");
   }
-
-  const userData = {
-    fullName: user.fullName,
-    username: user.username,
-    role: user.role,
-  };
-
-  const tokens = getNewTokens(userData);
-
-  return {
-    user: userData,
-    tokens,
-  };
 };
 
 const register = async (reqBody) => {
