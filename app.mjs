@@ -1,6 +1,6 @@
 // external import
 import cookieParser from "cookie-parser";
-import cors from "cors";
+// import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
@@ -25,12 +25,12 @@ app.use(cookieParser());
 dotenv.config();
 
 // Enable CORS for all routes
-app.use(
-  cors({
-    origin: `${process.env.ORIGIN_URL}`,
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: `${process.env.ORIGIN_URL}`,
+//     credentials: true,
+//   })
+// );
 
 // database connection with mongoose
 async function connectDB() {
