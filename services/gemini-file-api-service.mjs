@@ -6,8 +6,15 @@ import {
 } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyAGKbyiNTP5tul3EooIHR6ryqmJWwyZXLY",
+  apiKey: process.env.GEMINI_API_KEY,
 });
+
+const safetySettings = [
+  {
+    category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    threshold: "BLOCK_LOW_AND_ABOVE",
+  },
+];
 
 export async function generateQuizFromFileApi(
   userPrompt,
@@ -226,7 +233,7 @@ export async function generateQuizFromFileApi(
     // });
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash-lite",
       contents: createUserContent([
         // instruction,
         { text: instruction },
@@ -310,6 +317,7 @@ export async function generateQuizFromFileApi(
           },
           propertyOrdering: ["message", "topic", "description", "quizData"],
         },
+        safetySettings: safetySettings,
       },
     });
 

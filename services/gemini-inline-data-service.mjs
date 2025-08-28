@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyAGKbyiNTP5tul3EooIHR6ryqmJWwyZXLY",
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 export async function generateQuizFromInlineData(
