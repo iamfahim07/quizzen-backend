@@ -8,6 +8,7 @@ import topicDataValidator from "../middlewares/topic-data-validator.mjs";
 import QuizModel from "../models/quiz-model.mjs";
 import QuizTopicModel from "../models/quiz-topic-model.mjs";
 import removeExtraSpaces from "../utilities/remove-extra-spaces.mjs";
+import { escapeRegex } from "../utilities/utils.mjs";
 
 // router setup
 const router = express.Router();
@@ -41,7 +42,7 @@ router.post("/", topicDataValidator, async (req, res) => {
   try {
     // checking if the topic already exist or not
     const regexParamsValue = new RegExp(
-      `^${removeExtraSpaces(req.body.title)}$`,
+      `^${escapeRegex(removeExtraSpaces(req.body.title))}$`,
       "i"
     );
     const isTopicExist = await QuizTopicModel.findOne({
@@ -122,7 +123,7 @@ router.put("/", topicDataValidator, async (req, res) => {
     };
 
     const regexParamsValue = new RegExp(
-      `^${removeExtraSpaces(data.title)}$`,
+      `^${escapeRegex(removeExtraSpaces(data.title))}$`,
       "i"
     );
 

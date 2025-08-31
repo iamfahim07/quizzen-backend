@@ -9,3 +9,7 @@ export function generateUniqueId(prefix = "") {
   const extraRandom = Math.random().toString(36).substring(2, 5); // Extra entropy
   return `${prefix}${timestamp}-${randomStr}${extraRandom}`;
 }
+
+export function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
