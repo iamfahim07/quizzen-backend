@@ -22,7 +22,6 @@ const login = async (username, password) => {
   try {
     const user = await userModel.findOne({ username });
 
-    // Always perform bcrypt comparison to prevent timing attacks
     const hashToCompare =
       user?.password || "$2b$12$dummyhashtopreventtimingattacks1234567890";
 
@@ -83,25 +82,9 @@ const register = async (reqBody) => {
       e.status = 409;
       throw e;
     }
-    // Unexpected errors are rethrown
+
     throw err;
   }
-
-  // const newUserInfo = new userModel(newUserInfoData);
-  // const newUser = await newUserInfo.save();
-
-  // const newUserData = {
-  //   fullName: newUser.fullName,
-  //   username: newUser.username,
-  //   role: newUser.role,
-  // };
-
-  // const tokens = getNewTokens(newUserData);
-
-  // return {
-  //   user: newUserData,
-  //   tokens,
-  // };
 };
 
 const googleAuth = async (reqBody) => {
@@ -137,13 +120,11 @@ const googleAuth = async (reqBody) => {
 
     return { user: userData, tokens };
   } catch (err) {
-    // Unexpected errors are rethrown
     throw err;
   }
 };
 
 const refreshToken = async (refreshToken) => {
-  // check if refresh token valid
   const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY);
 
   const user = {

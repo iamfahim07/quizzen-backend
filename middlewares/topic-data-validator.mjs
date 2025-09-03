@@ -5,7 +5,6 @@ import path from "path";
 import "../firebase.mjs";
 import singleUploader from "../utilities/uploader.mjs";
 
-// receive the image
 export default function topicDataValidator(req, res, next) {
   const upload = singleUploader(
     ["image/png", "image/jpg", "image/jpeg", "image/webp", "image/jfif"],
@@ -13,7 +12,6 @@ export default function topicDataValidator(req, res, next) {
     "Only .jpg, .jpeg, .jfif, .png and .webp formet are allowed!"
   );
 
-  // call the image uploader function
   upload.single("quiz_image")(req, res, async (err) => {
     const title =
       typeof req.body.title === "string" &&
@@ -34,7 +32,6 @@ export default function topicDataValidator(req, res, next) {
         if (err) {
           throw new Error(err);
         } else {
-          // checking if file exist or not
           if (req.file) {
             // modifying the image name
             const ext = path.extname(req.file.originalname);
@@ -62,7 +59,6 @@ export default function topicDataValidator(req, res, next) {
 
             next();
           } else {
-            // sending the necessary data to the next middleware
             req.body.img_object = null;
             req.body.img_ref = null;
 

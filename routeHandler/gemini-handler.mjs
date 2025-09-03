@@ -57,10 +57,6 @@ router.post("/", fileUploadMiddleware, async (req, res) => {
       ];
 
       await setWithExpire(conversationId, prevConversations, 5 * 60);
-
-      // const { value: updatedValue } = (await getWithTTL(conversationId)) || {};
-
-      // console.log(updatedValue[0].filesInfo);
     } else {
       const { response, filesParts, userPrompt } =
         await generateQuizFromFileApi(prompt, difficulty, files_array);
@@ -94,7 +90,6 @@ router.post("/", fileUploadMiddleware, async (req, res) => {
 
     res.status(200).json({
       data: quizData,
-      // data: "success",
     });
   } catch (err) {
     res.status(500).json({

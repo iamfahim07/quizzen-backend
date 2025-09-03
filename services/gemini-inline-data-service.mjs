@@ -164,7 +164,6 @@ export async function generateQuizFromInlineData(
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            // New property: message, placed first
             message: {
               type: Type.STRING,
             },
@@ -236,4 +235,3 @@ export async function generateQuizFromInlineData(
     console.log(err);
   }
 }
-// test

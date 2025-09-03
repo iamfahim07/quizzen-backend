@@ -186,26 +186,6 @@ export async function generateQuizFromFileApi(
   `;
 
   try {
-    // res.json({ key, value, expiresIn: TTL_SECONDS });
-
-    // const imageBlob = new Blob([files_array[0].buffer], {
-    //   type: files_array[0].mimetype,
-    // });
-    // const imageBlob2 = new Blob([files_array[1].buffer], {
-    //   type: files_array[1].mimetype,
-    // });
-
-    // const myfile = await ai.files.upload({
-    //   file: imageBlob,
-    //   config: { mimeType: files_array[0].mimetype },
-    // });
-
-    // const myfile2 = await ai.files.upload({
-    //   file: imageBlob2,
-    //   config: { mimeType: files_array[1].mimetype },
-    // });
-
-    // changeing code
     const filesParts = [];
     if (files_array && files_array.length > 0) {
       for (const file of files_array) {
@@ -222,26 +202,12 @@ export async function generateQuizFromFileApi(
       }
     }
 
-    // const modifiedPrevConversations = prevConversations.flatMap((el) => {
-    //   if (Array.isArray(el.filesInfo)) {
-    //     return el.filesInfo.map((fi) =>
-    //       createPartFromUri(fi.fileUri, fi.mimeType)
-    //     );
-    //   }
-
-    //   return el;
-    // });
-
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite",
       contents: createUserContent([
-        // instruction,
         { text: instruction },
         ...prevConversations,
-        // createPartFromUri(myfile.uri, myfile.mimeType),
-        // createPartFromUri(myfile2.uri, myfile2.mimeType),
         ...filesParts,
-        // userPrompt,
         { text: userPrompt },
       ]),
       config: {

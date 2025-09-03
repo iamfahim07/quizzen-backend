@@ -40,7 +40,6 @@ router.get("/", async (req, res) => {
 // post a quiz topic
 router.post("/", topicDataValidator, async (req, res) => {
   try {
-    // checking if the topic already exist or not
     const regexParamsValue = new RegExp(
       `^${escapeRegex(removeExtraSpaces(req.body.title))}$`,
       "i"
@@ -56,7 +55,6 @@ router.post("/", topicDataValidator, async (req, res) => {
       });
     }
 
-    // checking if an image file exist or not
     if (!req.body.img_object || !req.body.img_ref) {
       return res.status(409).json({
         message: "No image file exist. please upload one",
@@ -77,7 +75,6 @@ router.post("/", topicDataValidator, async (req, res) => {
     const newQuizTopic = new QuizTopicModel(data);
     await newQuizTopic.save();
 
-    // creating a quiz database document for the newly added topic
     const new_quiz_data = {
       relatedTopicId: newQuizTopic.id,
       questionVault: [],
@@ -86,7 +83,6 @@ router.post("/", topicDataValidator, async (req, res) => {
     const new_quiz = new QuizModel(new_quiz_data);
     await new_quiz.save();
 
-    // sending response
     res.status(200).json({
       data: newQuizTopic,
     });
@@ -105,7 +101,6 @@ router.post("/", topicDataValidator, async (req, res) => {
 // update a quiz topic
 router.put("/", topicDataValidator, async (req, res) => {
   try {
-    // checking if the topic already exist or not
     const isTopicExist = await QuizTopicModel.findOne({
       _id: req.body.id,
     });
@@ -116,7 +111,6 @@ router.put("/", topicDataValidator, async (req, res) => {
       });
     }
 
-    // extracting all relevant data from the request
     let data = {
       title: removeExtraSpaces(req.body.title),
       description: removeExtraSpaces(req.body.description),
@@ -127,7 +121,6 @@ router.put("/", topicDataValidator, async (req, res) => {
       "i"
     );
 
-    // checking if the topic name already taken or not
     const isTopicNameTaken = await QuizTopicModel.findOne({
       title: regexParamsValue,
     });
@@ -144,10 +137,8 @@ router.put("/", topicDataValidator, async (req, res) => {
 
     // delete the existing image file if the user wants to update the image with a new image
     if (req.body.img_object && req.body.img_ref) {
-      // delete the existing image file
       await firebaseFileDelete(isTopicExist.img_ref);
 
-      // upload the new image
       const new_img_link = await firebaseFileUpload(
         req.body.img_object,
         req.body.img_ref
@@ -187,14 +178,9 @@ router.put("/", topicDataValidator, async (req, res) => {
 // delete a quiz topic
 router.delete("/", async (req, res) => {
   try {
-    // const data = {
-    //   id: req.body.payload,
-    // };
-
     const { topicId } = req.body;
 
     if (topicId) {
-      // delete the document from MongoDB
       const { img_ref } = await QuizTopicModel.findByIdAndDelete(
         topicId
       ).select({

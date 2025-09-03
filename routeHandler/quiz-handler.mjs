@@ -51,27 +51,17 @@ router.post("/:topicId", async (req, res) => {
   try {
     const paramsValue = req.params.topicId;
 
-    // checking if the topic exist or not
     const isTopicExist = await QuizTopicModel.findById(paramsValue);
 
-    // checking if the quiz already exist or not
     const isQuizExist = await QuizModel.findOne({
       relatedTopicId: paramsValue,
     });
 
     const payload = req.body;
 
-    // Defensive guard – makes debugging 400s easier if the client sends the wrong shape
     if (!Array.isArray(payload)) {
       return res.status(400).json({ error: "payload must be an array" });
     }
-
-    // const {
-    //   question,
-    //   isMultiple,
-    //   isSortQuiz,
-    //   options: rawOptions,
-    // } = req.body.payload;
 
     // data to save
     const received_data = payload.map(
@@ -134,20 +124,14 @@ router.put("/:topicId", async (req, res) => {
   try {
     const paramsValue = req.params.topicId;
 
-    // checking if the topic exist or not
     const isTopicExist = await QuizTopicModel.findById(paramsValue);
 
-    // checking if the quiz already exist or not
     const isQuizExist = await QuizModel.findOne({
       relatedTopicId: paramsValue,
     });
 
-    // checking if the quiz is true/false or sortable
-    // const isSortQuiz = req.body.payload.quizData.isSortQuiz;
-
     const payload = req.body;
 
-    // Defensive guard – makes debugging 400s easier if the client sends the wrong shape
     if (!Array.isArray(payload)) {
       return res.status(400).json({ error: "payload must be an array" });
     }
@@ -167,62 +151,6 @@ router.put("/:topicId", async (req, res) => {
           })),
       })
     );
-
-    // data to save
-    // const received_data = {
-    //   id: req.body.payload.id,
-    //   quizData: {
-    //     question: removeExtraSpaces(req.body.payload.quizData.question),
-    //     isMultiple: isSortQuiz ? false : req.body.payload.quizData.isMultiple,
-    //     isSortQuiz: isSortQuiz,
-    //     options: [
-    //       {
-    //         value: removeExtraSpaces(
-    //           req.body.payload.quizData.options[0].value
-    //         ),
-    //         isCorrect: isSortQuiz
-    //           ? false
-    //           : req.body.payload.quizData.options[0].isCorrect,
-    //         position: isSortQuiz
-    //           ? req.body.payload.quizData.options[0].position
-    //           : null,
-    //       },
-    //       {
-    //         value: removeExtraSpaces(
-    //           req.body.payload.quizData.options[1].value
-    //         ),
-    //         isCorrect: isSortQuiz
-    //           ? false
-    //           : req.body.payload.quizData.options[1].isCorrect,
-    //         position: isSortQuiz
-    //           ? req.body.payload.quizData.options[1].position
-    //           : null,
-    //       },
-    //       {
-    //         value: removeExtraSpaces(
-    //           req.body.payload.quizData.options[2].value
-    //         ),
-    //         isCorrect: isSortQuiz
-    //           ? false
-    //           : req.body.payload.quizData.options[2].isCorrect,
-    //         position: isSortQuiz
-    //           ? req.body.payload.quizData.options[2].position
-    //           : null,
-    //       },
-    //       {
-    //         value: removeExtraSpaces(
-    //           req.body.payload.quizData.options[3].value
-    //         ),
-    //         isCorrect: isSortQuiz
-    //           ? false
-    //           : req.body.payload.quizData.options[3].isCorrect,
-    //         position: isSortQuiz
-    //           ? req.body.payload.quizData.options[3].position
-    //           : null,
-    //       },
-    //     ],
-    //   },
-    // };
 
     if (isTopicExist && isQuizExist && received_data) {
       const new_questionVault_value = isQuizExist.questionVault.reduce(
@@ -266,7 +194,6 @@ router.delete("/:topicId", async (req, res) => {
   try {
     const paramsValue = req.params.topicId;
 
-    // checking if the quiz already exist or not
     const isQuizExist = await QuizModel.findOne({
       relatedTopicId: paramsValue,
     });

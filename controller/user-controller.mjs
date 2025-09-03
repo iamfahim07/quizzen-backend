@@ -111,19 +111,6 @@ export const logout = async (req, res) => {
       req.session.destroy();
     }
 
-    // res.clearCookie("accessToken", {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "None",
-    //   path: "/",
-    // });
-    // res.clearCookie("refreshToken", {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "None",
-    //   path: "/",
-    // });
-
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
     res.status(500).json({ message: "Logout failed" });
@@ -162,20 +149,6 @@ export const register = async (req, res, next) => {
     res.status(201).json({ data: user });
   } catch (err) {
     return next(err);
-    // if (err.code === 11000) {
-    //   return res.status(409).json({
-    //     message: "Username or email already exists, please choose another.",
-    //   });
-    // }
-    // console.error(err);
-    // return res.status(500).json({
-    //   message: "An unexpected server error occurred.",
-    // });
-
-    // res.status(500).json({
-    //   message:
-    //     "Sorry, that username is already taken. Please try a different one.",
-    // });
   }
 };
 
